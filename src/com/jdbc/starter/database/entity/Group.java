@@ -1,22 +1,20 @@
 package com.jdbc.starter.database.entity;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Data
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Group {
 
-    @Schema(hidden = true)
     private Long id;
-    @Schema(description = "Group name")
     private String name;
-    @Schema(hidden = true)
     private LocalDateTime createdAt;
 
     public Group(String name, LocalDateTime createdAt) {

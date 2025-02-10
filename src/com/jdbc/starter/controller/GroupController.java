@@ -1,12 +1,15 @@
 package com.jdbc.starter.controller;
 
-import com.jdbc.starter.database.entity.Group;
+import com.jdbc.starter.database.dto.request.GroupRequest;
+import com.jdbc.starter.database.dto.response.GroupResponse;
 import com.jdbc.starter.services.GroupService;
-import com.jdbc.starter.util.constants.SwaggerConstants;
+import com.jdbc.starter.constants.SwaggerConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,9 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 
-import static com.jdbc.starter.util.constants.SwaggerConstants.GROUP_ID_DESCRIPTION;
+import static com.jdbc.starter.constants.SwaggerConstants.GROUP_ID_DESCRIPTION;
 
 @Tag(name = SwaggerConstants.GROUPS_TAG, description = SwaggerConstants.GROUPS_DESCRIPTION)
 @RestController
@@ -35,36 +37,43 @@ public class GroupController {
 
     @Operation(summary = SwaggerConstants.GET_ALL_GROUPS_SUMMARY, description = SwaggerConstants.GET_ALL_GROUPS_DESC)
     @GetMapping
-    public List<Group> getAllGroups() {
-        return groupService.getAllGroups();
+    public ResponseEntity<List<GroupResponse>> getAllGroups() {
+        return ResponseEntity.ok(groupService.getAllGroups());
     }
 
     @Operation(summary = SwaggerConstants.GET_GROUP_BY_ID_SUMMARY, description = SwaggerConstants.GET_GROUP_BY_ID_DESC)
     @GetMapping("/{id}")
-    public Optional<Group> getGroupById(
+    public ResponseEntity<GroupResponse> getGroupById(
             @Parameter(description = GROUP_ID_DESCRIPTION, required = true) @PathVariable Long id) {
-        return groupService.getGroupById(id);
+        return groupService.getGroupById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @Operation(summary = SwaggerConstants.CREATE_GROUP_SUMMARY, description = SwaggerConstants.CREATE_GROUP_DESC)
     @PostMapping
-    public Group createGroup(@RequestBody Group group) {
-        return groupService.saveGroup(group);
+    public ResponseEntity<GroupResponse> createGroup(@Valid @RequestBody GroupRequest request) {
+        GroupResponse response = groupService.saveGroup(request);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = SwaggerConstants.UPDATE_GROUP_SUMMARY, description = SwaggerConstants.UPDATE_GROUP_DESC)
     @PutMapping("/{id}")
-    public void updateGroup(
+    public ResponseEntity<Void> updateGroup(
             @Parameter(description = GROUP_ID_DESCRIPTION, required = true) @PathVariable Long id,
-            @RequestBody Group group) {
-        group.setId(id);
-        groupService.updateGroup(group);
+            @Valid @RequestBody GroupRequest request) {
+        groupService.updateGroup(id, request);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = SwaggerConstants.DELETE_GROUP_SUMMARY, description = SwaggerConstants.DELETE_GROUP_DESC)
     @DeleteMapping("/{id}")
-    public boolean deleteGroup(
+    public ResponseEntity<Void> deleteGroup(
             @Parameter(description = GROUP_ID_DESCRIPTION, required = true) @PathVariable Long id) {
-        return groupService.deleteGroup(id);
+        boolean isDeleted = groupService.deleteGroup(id);
+        if (isDeleted) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

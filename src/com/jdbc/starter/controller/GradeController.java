@@ -1,12 +1,15 @@
 package com.jdbc.starter.controller;
 
-import com.jdbc.starter.database.entity.Grade;
+import com.jdbc.starter.database.dto.request.GradeRequest;
+import com.jdbc.starter.database.dto.response.GradeResponse;
 import com.jdbc.starter.services.GradeService;
-import com.jdbc.starter.util.constants.SwaggerConstants;
+import com.jdbc.starter.constants.SwaggerConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,9 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 
-import static com.jdbc.starter.util.constants.SwaggerConstants.GRADE_ID_DESCRIPTION;
+import static com.jdbc.starter.constants.SwaggerConstants.GRADE_ID_DESCRIPTION;
 
 @Tag(name = SwaggerConstants.GRADES_TAG, description = SwaggerConstants.GRADES_DESCRIPTION)
 @RestController
@@ -35,36 +37,43 @@ public class GradeController {
 
     @Operation(summary = SwaggerConstants.GET_ALL_GRADES_SUMMARY, description = SwaggerConstants.GET_ALL_GRADES_DESC)
     @GetMapping
-    public List<Grade> getAllGrades() {
-        return gradeService.getAllGrades();
+    public ResponseEntity<List<GradeResponse>> getAllGrades() {
+        return ResponseEntity.ok(gradeService.getAllGrades());
     }
 
     @Operation(summary = SwaggerConstants.GET_GRADE_BY_ID_SUMMARY, description = SwaggerConstants.GET_GRADE_BY_ID_DESC)
     @GetMapping("/{id}")
-    public Optional<Grade> getGradeById(
+    public ResponseEntity<GradeResponse> getGradeById(
             @Parameter(description = GRADE_ID_DESCRIPTION, required = true) @PathVariable Long id) {
-        return gradeService.getGradeById(id);
+        return gradeService.getGradeById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @Operation(summary = SwaggerConstants.CREATE_GRADE_SUMMARY, description = SwaggerConstants.CREATE_GRADE_DESC)
     @PostMapping
-    public Grade createGrade(@RequestBody Grade grade) {
-        return gradeService.saveGrade(grade);
+    public ResponseEntity<GradeResponse> createGrade(@Valid @RequestBody GradeRequest request) {
+        GradeResponse response = gradeService.saveGrade(request);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = SwaggerConstants.UPDATE_GRADE_SUMMARY, description = SwaggerConstants.UPDATE_GRADE_DESC)
     @PutMapping("/{id}")
-    public void updateGrade(
+    public ResponseEntity<Void> updateGrade(
             @Parameter(description = GRADE_ID_DESCRIPTION, required = true) @PathVariable Long id,
-            @RequestBody Grade grade) {
-        grade.setId(id);
-        gradeService.updateGrade(grade);
+            @Valid @RequestBody GradeRequest request) {
+        gradeService.updateGrade(id, request);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = SwaggerConstants.DELETE_GRADE_SUMMARY, description = SwaggerConstants.DELETE_GRADE_DESC)
     @DeleteMapping("/{id}")
-    public boolean deleteGrade(
+    public ResponseEntity<Void> deleteGrade(
             @Parameter(description = GRADE_ID_DESCRIPTION, required = true) @PathVariable Long id) {
-        return gradeService.deleteGrade(id);
+        boolean isDeleted = gradeService.deleteGrade(id);
+        if (isDeleted) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

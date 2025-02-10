@@ -1,20 +1,25 @@
-package com.jdbc.starter.database.dao;
+package com.jdbc.starter.repository;
 
-import com.jdbc.starter.database.entity.Group;
 import com.jdbc.starter.database.entity.Student;
 import com.jdbc.starter.exception.DaoException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class StudentDao {
+@RequiredArgsConstructor
+public class StudentRepository {
 
     private static final String DELETE_SQL = "DELETE FROM students WHERE id = ?";
     private static final String SAVE_SQL = "INSERT INTO students(first_name, last_name, group_id, created_at) VALUES (?, ?, ?, ?)";
@@ -25,13 +30,9 @@ public class StudentDao {
 
     private static final String FIND_STUDENTS_BY_GROUP_SQL = "SELECT id, first_name, last_name, group_id, created_at FROM students WHERE group_id = ?";
     private static final String FIND_STUDENTS_BY_NAME_SQL = "SELECT id, first_name, last_name, group_id, created_at FROM students WHERE first_name LIKE ? OR last_name LIKE ? ORDER BY first_name ASC, last_name ASC";
+    private static final String ORDER_STUDENT_BY_NAME = FIND_ALL_SQL + " ORDER BY %s %s";
 
     private final DataSource dataSource;
-
-    @Autowired
-    public StudentDao(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
 
     public List<Student> findAll() {
         try (Connection connection = dataSource.getConnection();
@@ -150,12 +151,24 @@ public class StudentDao {
         }
     }
 
-    private static Group buildGroup(ResultSet resultSet) throws SQLException {
-        return new Group(
-                resultSet.getLong("id"),
-                resultSet.getString("name"),
-                resultSet.getTimestamp("created_at").toLocalDateTime()
-        );
+    public List<Student> getSortedStudents(String sort, String order) {
+        String column = switch (sort) {
+            case "lastName" -> "last_name";
+            default -> "first_name";
+        };
+        String direction = order.equalsIgnoreCase("desc") ? "DESC" : "ASC";
+        String sql = String.format(ORDER_STUDENT_BY_NAME, column, direction);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Student> students = new ArrayList<>();
+            while (resultSet.next()) {
+                students.add(buildStudent(resultSet));
+            }
+            return students;
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
     }
 
     private static Student buildStudent(ResultSet resultSet) throws SQLException {

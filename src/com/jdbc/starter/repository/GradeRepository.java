@@ -1,18 +1,24 @@
-package com.jdbc.starter.database.dao;
+package com.jdbc.starter.repository;
 
 import com.jdbc.starter.database.entity.Grade;
 import com.jdbc.starter.exception.DaoException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class GradeDao {
+@RequiredArgsConstructor
+public class GradeRepository {
 
     private static final String DELETE_SQL = "DELETE FROM grades WHERE id = ?";
     private static final String SAVE_SQL = "INSERT INTO grades(student_id, subject, score, created_at) VALUES (?, ?, ?, ?)";
@@ -21,11 +27,6 @@ public class GradeDao {
     private static final String FIND_BY_ID_SQL = FIND_ALL_SQL + " WHERE id = ?";
 
     private final DataSource dataSource;
-
-    @Autowired
-    public GradeDao(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
 
     public List<Grade> findAll() {
         try (Connection connection = dataSource.getConnection();

@@ -1,4 +1,4 @@
-package com.jdbc.starter.util.constants;
+package com.jdbc.starter.constants;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

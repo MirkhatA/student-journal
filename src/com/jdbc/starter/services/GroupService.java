@@ -1,40 +1,51 @@
 package com.jdbc.starter.services;
 
-import com.jdbc.starter.database.dao.GroupDao;
+import com.jdbc.starter.database.dto.request.GroupRequest;
+import com.jdbc.starter.database.dto.response.GroupResponse;
+import com.jdbc.starter.mapper.GroupMapper;
+import com.jdbc.starter.repository.GroupRepository;
 import com.jdbc.starter.database.entity.Group;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class GroupService {
 
-    private final GroupDao groupDao;
+    private final GroupRepository groupRepository;
 
     @Autowired
-    public GroupService(GroupDao groupDao) {
-        this.groupDao = groupDao;
+    public GroupService(GroupRepository groupRepository) {
+        this.groupRepository = groupRepository;
     }
 
-    public List<Group> getAllGroups() {
-        return groupDao.findAll();
+    public List<GroupResponse> getAllGroups() {
+        return groupRepository.findAll().stream()
+                .map(GroupMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
-    public Optional<Group> getGroupById(Long id) {
-        return groupDao.findById(id);
+    public Optional<GroupResponse> getGroupById(Long id) {
+        return groupRepository.findById(id)
+                .map(GroupMapper::toResponse);
     }
 
-    public Group saveGroup(Group group) {
-        return groupDao.save(group);
+    public GroupResponse saveGroup(GroupRequest request) {
+        Group group = GroupMapper.toEntity(request);
+        Group savedGroup = groupRepository.save(group);
+        return GroupMapper.toResponse(savedGroup);
     }
 
-    public void updateGroup(Group group) {
-        groupDao.update(group);
+    public void updateGroup(Long id, GroupRequest request) {
+        Group group = GroupMapper.toEntity(request);
+        group.setId(id);
+        groupRepository.update(group);
     }
 
     public boolean deleteGroup(Long id) {
-        return groupDao.delete(id);
+        return groupRepository.delete(id);
     }
 }
