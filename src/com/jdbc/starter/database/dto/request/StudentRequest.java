@@ -1,5 +1,6 @@
 package com.jdbc.starter.database.dto.request;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -18,6 +19,7 @@ public class StudentRequest {
     @NotBlank(message = "Last name cannot be empty")
     private String lastName;
 
+    @JsonSerialize()
     @Schema(description = "Group id", example = "1")
     @NotNull(message = "Group ID cannot be null")
     private Long groupId;

@@ -5,7 +5,7 @@ import com.jdbc.starter.database.dto.response.GradeResponse;
 import com.jdbc.starter.mapper.GradeMapper;
 import com.jdbc.starter.repository.GradeRepository;
 import com.jdbc.starter.database.entity.Grade;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,14 +13,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class GradeService {
 
     private final GradeRepository gradeRepository;
-
-    @Autowired
-    public GradeService(GradeRepository gradeRepository) {
-        this.gradeRepository = gradeRepository;
-    }
 
     public List<GradeResponse> getAllGrades() {
         return gradeRepository.findAll().stream()

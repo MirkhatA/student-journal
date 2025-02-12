@@ -70,4 +70,9 @@ public class SwaggerConstants {
 
     public static final String DELETE_GRADE_SUMMARY = "Delete grade";
     public static final String DELETE_GRADE_DESC = "Removes a grade from the database by ID.";
+
+    public static final String SORT_STUDENTS_SUMMARY = "Get sorted list of students";
+    public static final String SORT_STUDENTS_DESC = "Sort students by first name or last name";
+    public static final String SORT_PARAM_DESCRIPTION = "Sort by field: 'firstName' or 'lastName'";
+    public static final String ORDER_PARAM_DESCRIPTION = "Sort order: 'asc' (ascending) or 'desc' (descending)";
 }

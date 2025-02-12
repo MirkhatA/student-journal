@@ -5,7 +5,7 @@ import com.jdbc.starter.database.dto.response.StudentResponse;
 import com.jdbc.starter.mapper.StudentMapper;
 import com.jdbc.starter.repository.StudentRepository;
 import com.jdbc.starter.database.entity.Student;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,13 +13,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class StudentService {
     private final StudentRepository studentRepository;
-
-    @Autowired
-    public StudentService(StudentRepository studentRepository) {
-        this.studentRepository = studentRepository;
-    }
 
     public List<StudentResponse> getAllStudents() {
         return studentRepository.findAll().stream()

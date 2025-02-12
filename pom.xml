@@ -14,6 +14,7 @@
         <mysql.version>8.0.33</mysql.version>
         <lombok.version>1.18.28</lombok.version>
         <jackson.version>2.15.2</jackson.version>
+        <start-class>com.jdbc.starter.StudentJournalApplication</start-class>
     </properties>
 
     <dependencies>
@@ -71,11 +72,6 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-            <version>${spring.boot.version}</version>
         </dependency>
 
     </dependencies>

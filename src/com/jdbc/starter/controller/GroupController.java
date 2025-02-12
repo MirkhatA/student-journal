@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,15 +26,11 @@ import static com.jdbc.starter.constants.SwaggerConstants.GROUP_ID_DESCRIPTION;
 
 @Tag(name = SwaggerConstants.GROUPS_TAG, description = SwaggerConstants.GROUPS_DESCRIPTION)
 @RestController
-@RequestMapping("/groups")
+@RequestMapping("/v1/groups")
+@RequiredArgsConstructor
 public class GroupController {
 
     private final GroupService groupService;
-
-    @Autowired
-    public GroupController(GroupService groupService) {
-        this.groupService = groupService;
-    }
 
     @Operation(summary = SwaggerConstants.GET_ALL_GROUPS_SUMMARY, description = SwaggerConstants.GET_ALL_GROUPS_DESC)
     @GetMapping

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +35,10 @@ import static com.jdbc.starter.constants.SwaggerConstants.GET_STUDENT_BY_ID_DESC
 import static com.jdbc.starter.constants.SwaggerConstants.GET_STUDENT_BY_ID_SUMMARY;
 import static com.jdbc.starter.constants.SwaggerConstants.GROUP_ID_DESCRIPTION;
 import static com.jdbc.starter.constants.SwaggerConstants.NAME_TO_SEARCH_DESCRIPTION;
+import static com.jdbc.starter.constants.SwaggerConstants.ORDER_PARAM_DESCRIPTION;
+import static com.jdbc.starter.constants.SwaggerConstants.SORT_PARAM_DESCRIPTION;
+import static com.jdbc.starter.constants.SwaggerConstants.SORT_STUDENTS_DESC;
+import static com.jdbc.starter.constants.SwaggerConstants.SORT_STUDENTS_SUMMARY;
 import static com.jdbc.starter.constants.SwaggerConstants.STUDENTS_DESCRIPTION;
 import static com.jdbc.starter.constants.SwaggerConstants.STUDENTS_TAG;
 import static com.jdbc.starter.constants.SwaggerConstants.STUDENT_ID_DESCRIPTION;
@@ -42,14 +47,11 @@ import static com.jdbc.starter.constants.SwaggerConstants.UPDATE_STUDENT_SUMMARY
 
 @Tag(name = STUDENTS_TAG, description = STUDENTS_DESCRIPTION)
 @RestController
-@RequestMapping("/students")
+@RequestMapping("/v1/students")
+@RequiredArgsConstructor
 public class StudentController {
 
     private final StudentService studentService;
-
-    public StudentController(StudentService studentService) {
-        this.studentService = studentService;
-    }
 
     @Operation(summary = GET_ALL_STUDENTS_SUMMARY, description = GET_ALL_STUDENTS_DESC)
     @GetMapping
@@ -120,10 +122,10 @@ public class StudentController {
         return ResponseEntity.notFound().build();
     }
 
-    @Operation(summary = "Get sorted list of students", description = "Sort students by first name or last name")
+    @Operation(summary = SORT_STUDENTS_SUMMARY, description = SORT_STUDENTS_DESC)
     public ResponseEntity<List<StudentResponse>> getSortedStudents(
-            @RequestParam(required = false, defaultValue = "firstName") String sort,
-            @RequestParam(required = false, defaultValue = "asc") String order) {
+            @RequestParam(required = false, defaultValue = SORT_PARAM_DESCRIPTION) String sort,
+            @RequestParam(required = false, defaultValue = ORDER_PARAM_DESCRIPTION) String order) {
         return ResponseEntity.ok(studentService.getSortedStudents(sort, order));
     }
 }

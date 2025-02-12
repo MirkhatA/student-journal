@@ -5,7 +5,7 @@ import com.jdbc.starter.database.dto.response.GroupResponse;
 import com.jdbc.starter.mapper.GroupMapper;
 import com.jdbc.starter.repository.GroupRepository;
 import com.jdbc.starter.database.entity.Group;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,14 +13,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class GroupService {
 
     private final GroupRepository groupRepository;
-
-    @Autowired
-    public GroupService(GroupRepository groupRepository) {
-        this.groupRepository = groupRepository;
-    }
 
     public List<GroupResponse> getAllGroups() {
         return groupRepository.findAll().stream()
