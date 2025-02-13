@@ -25,12 +25,28 @@ public class GradeRepository {
     private static final String UPDATE_SQL = "UPDATE grades SET student_id = ?, subject = ?, score = ? WHERE id = ?";
     private static final String FIND_ALL_SQL = "SELECT id, student_id, subject, score, created_at FROM grades";
     private static final String FIND_BY_ID_SQL = FIND_ALL_SQL + " WHERE id = ?";
+    private static final String FIND_BY_STUDENT_ID_SQL = FIND_ALL_SQL + " WHERE student_id = ?";
 
     private final DataSource dataSource;
 
     public List<Grade> findAll() {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_SQL)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Grade> grades = new ArrayList<>();
+            while (resultSet.next()) {
+                grades.add(buildGrade(resultSet));
+            }
+            return grades;
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+    }
+
+    public List<Grade> getAllGradesByStudentId(int studentId) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_STUDENT_ID_SQL)) {
+            preparedStatement.setLong(1, studentId);
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Grade> grades = new ArrayList<>();
             while (resultSet.next()) {
@@ -107,4 +123,5 @@ public class GradeRepository {
                 resultSet.getDate("created_at").toLocalDate()
         );
     }
+
 }

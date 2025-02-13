@@ -24,6 +24,12 @@ public class GradeService {
                 .collect(Collectors.toList());
     }
 
+    public List<GradeResponse> getAllGradesByStudentId(int studentId) {
+        return gradeRepository.getAllGradesByStudentId(studentId).stream()
+                .map(GradeMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
     public Optional<GradeResponse> getGradeById(Long id) {
         return gradeRepository.findById(id)
                 .map(GradeMapper::toResponse);
